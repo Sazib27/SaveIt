@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#121826" />
+    <title>SaveIt To-Do</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons.svg" />
+    <link rel="stylesheet" href="css/themes.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#task-list">Skip to task list</a>
+    <div id="app" class="app-shell" aria-live="polite">
+      <header class="app-header">
+        <h1>SaveIt To-Do</h1>
+        <div class="header-actions">
+          <button id="theme-toggle" type="button" aria-label="Toggle dark and light theme">🌙 Theme</button>
+          <button id="export-btn" type="button" aria-label="Export tasks">Export JSON</button>
+          <label class="import-label" for="import-input">Import JSON</label>
+          <input id="import-input" type="file" accept="application/json" aria-label="Import tasks JSON" />
+          <button id="clear-all-btn" type="button" class="danger" aria-label="Clear all tasks">Clear All</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="panel stats-panel" aria-label="Task statistics">
+          <h2>Statistics</h2>
+          <div class="stats-grid">
+            <article><span id="total-count">0</span><p>Total</p></article>
+            <article><span id="completed-count">0</span><p>Completed</p></article>
+            <article><span id="pending-count">0</span><p>Pending</p></article>
+            <article><span id="completion-percent">0%</span><p>Completion</p></article>
+          </div>
+          <div class="breakdown-grid">
+            <div>
+              <h3>By Category</h3>
+              <ul id="category-breakdown"></ul>
+            </div>
+            <div>
+              <h3>By Priority</h3>
+              <ul id="priority-breakdown"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel form-panel" aria-label="Task editor">
+          <h2 id="form-title">Create Task</h2>
+          <form id="task-form" novalidate>
+            <input type="hidden" id="task-id" />
+            <label for="task-title">Title *</label>
+            <input id="task-title" name="title" maxlength="200" required />
+
+            <label for="task-description">Description</label>
+            <textarea id="task-description" name="description" maxlength="1000"></textarea>
+
+            <div class="form-row">
+              <div>
+                <label for="task-priority">Priority</label>
+                <select id="task-priority" name="priority">
+                  <option value="high">High</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+              <div>
+                <label for="task-due-date">Due Date</label>
+                <input id="task-due-date" name="dueDate" type="datetime-local" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div>
+                <label for="task-category">Category</label>
+                <input id="task-category" name="category" list="category-options" placeholder="Work" />
+                <datalist id="category-options"></datalist>
+              </div>
+              <div>
+                <label for="task-recurring">Recurring</label>
+                <select id="task-recurring" name="recurring">
+                  <option value="none" selected>None</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+
+            <label for="task-notes">Notes</label>
+            <textarea id="task-notes" name="notes" maxlength="1000"></textarea>
+
+            <label for="task-subtasks">Subtasks (comma-separated)</label>
+            <input id="task-subtasks" name="subtasks" placeholder="Email client, Review PR" />
+
+            <div class="form-actions">
+              <button type="submit" id="save-task-btn">Save Task</button>
+              <button type="button" id="cancel-edit-btn" class="ghost">Cancel</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel controls-panel" aria-label="Task filters">
+          <h2>Filter & Sort</h2>
+          <div class="controls-grid">
+            <label for="search-input">Search</label>
+            <input id="search-input" placeholder="Search title or description" />
+
+            <label for="status-filter">Status</label>
+            <select id="status-filter">
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+            </select>
+
+            <label for="priority-filter">Priority</label>
+            <select id="priority-filter">
+              <option value="all">All</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+
+            <label for="category-filter">Category</label>
+            <select id="category-filter">
+              <option value="all">All</option>
+            </select>
+
+            <label for="sort-select">Sort By</label>
+            <select id="sort-select">
+              <option value="createdAt_desc">Date Created (Newest)</option>
+              <option value="createdAt_asc">Date Created (Oldest)</option>
+              <option value="dueDate_asc">Due Date (Earliest)</option>
+              <option value="dueDate_desc">Due Date (Latest)</option>
+              <option value="priority_desc">Priority (High to Low)</option>
+              <option value="priority_asc">Priority (Low to High)</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="panel list-panel" aria-label="Task list">
+          <div class="list-header">
+            <h2>Tasks</h2>
+            <div class="history-actions">
+              <button id="undo-btn" type="button">Undo</button>
+              <button id="redo-btn" type="button">Redo</button>
+            </div>
+          </div>
+          <div id="loading-state" class="hidden" role="status">Loading...</div>
+          <ul id="task-list"></ul>
+          <div id="empty-state" class="empty-state hidden">
+            <p>No tasks found. Create your first task with <kbd>Ctrl/Cmd + N</kbd>.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast-container" aria-live="assertive" aria-atomic="true"></div>
+
+    <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+      <h3 id="confirm-title">Please confirm</h3>
+      <p id="confirm-message"></p>
+      <div class="dialog-actions">
+        <button id="confirm-ok" type="button">Confirm</button>
+        <button id="confirm-cancel" type="button" class="ghost">Cancel</button>
+      </div>
+    </dialog>
+
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/shortcuts.js"></script>
+  </body>
+</html>
