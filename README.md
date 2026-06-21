@@ -1,43 +1,17 @@
-# SaveIt - Production-Ready Media Downloader
+# SaveIt Repository
 
-A complete full-stack media downloader application with YouTube, Instagram, TikTok, Facebook, Twitter, and Pinterest support.
+This repository now includes a standalone production-ready vanilla JavaScript to-do application with full local-storage support.
 
-## Features
-- 🎬 Multi-platform media downloading
-- 👤 User authentication with JWT
-- 💎 Premium subscription system
-- 💳 SSLCommerz payment integration
-- 📊 Admin dashboard with analytics
-- 📱 Mobile responsive design
-- 🌙 Dark modern theme
-- ⚡ Real-time download progress
+## To-Do Application
 
-## Tech Stack
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB with Mongoose
-- **Download Engine**: yt-dlp, ffmpeg
-- **Payment**: SSLCommerz
-- **Deployment**: PM2, Nginx
+Location: `/tmp/workspace/Sazib27/SaveIt/todo-app`
 
-## Installation & Setup
-See [INSTALLATION.md](docs/INSTALLATION.md) for complete setup guide.
+### Features
+- Task CRUD, completion toggles, priorities, due dates, categories/tags
+- Local storage persistence with auto-save, import/export, and clear-all
+- Filtering, sorting, and search
+- Statistics and analytics panels
+- Recurring tasks, notes/subtasks, reminders, undo/redo
+- Dark/light theme toggle, keyboard shortcuts, responsive UI
 
-## API Documentation
-See [API.md](docs/API.md) for complete API documentation.
-
-## Deployment
-See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for VPS deployment guide.
-
-## Project Structure
-```
-SaveIt/
-├── frontend/          # Frontend application
-├── backend/           # Backend API
-├── config/            # Deployment configs
-├── docs/              # Documentation
-└── README.md
-```
-
-## License
-MIT License
+See `todo-app/README.md` for usage details.
