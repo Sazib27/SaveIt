@@ -1,20 +1,35 @@
 const API_BASE = "http://localhost:5000/api";
 
-async function apiRequest(endpoint, method, body = null) {
+/**
+ * API request for JSON endpoints only
+ */
+async function apiRequest(endpoint, method = "GET", body = null) {
 
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+    const options = {
+        method,
+        headers: {}
+    };
 
-    method,
+    if (body) {
 
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token ? `Bearer ${token}` : ""
-    },
+        options.headers["Content-Type"] = "application/json";
 
-    body: body ? JSON.stringify(body) : null
-  });
+        options.body = JSON.stringify(body);
 
-  return response.json();
+    }
+
+    if (token) {
+
+        options.headers["Authorization"] =
+            `Bearer ${token}`;
+
+    }
+
+    const response =
+        await fetch(API_BASE + endpoint, options);
+
+    return response.json();
+
 }

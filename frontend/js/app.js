@@ -1,69 +1,143 @@
-async function fetchMedia(){
+// =====================================
+// Fetch Media
+// =====================================
 
-  const url = document.getElementById("mediaUrl").value;
+async function fetchMedia() {
 
-  const result = await apiRequest(
-    "/download/fetch",
-    "POST",
-    { url }
-  );
+    const url =
+        document.getElementById("mediaUrl").value.trim();
 
-  const preview = document.getElementById("mediaPreview");
+    if (!url) {
 
-  if(result.success){
+        alert("Enter a video URL");
+
+        return;
+
+    }
+
+    const result =
+        await apiRequest(
+            "/download/fetch",
+            "POST",
+            { url }
+        );
+
+    const preview =
+        document.getElementById("mediaPreview");
+
+    if (!result.success) {
+
+        preview.innerHTML =
+            "<p>Unable to fetch media.</p>";
+
+        return;
+
+    }
 
     preview.innerHTML = `
-      <img src="${result.thumbnail}" />
 
-      <h3>${result.title}</h3>
+        <img
+            src="${result.thumbnail}"
+            width="320"
+        >
 
-      <p>Duration: ${result.duration}s</p>
+        <h3>${result.title}</h3>
 
-      <button onclick="startDownload()">
-        Download Now
-      </button>
+        <p>
+            Duration :
+            ${result.duration} sec
+        </p>
+
+        <button
+            onclick="startDownload()"
+        >
+            Download Now
+        </button>
+
     `;
-
-  }else{
-
-    preview.innerHTML = `
-      <p>Failed to fetch media</p>
-    `;
-
-  }
 
 }
 
-async function startDownload(){
 
-  const url = document.getElementById("mediaUrl").value;
 
-  const typeElement = document.getElementById("downloadType");
+// =====================================
+// Start Download
+// =====================================
 
-  const type = typeElement ? typeElement.value : "mp4";
+function startDownload() {
 
-  const result = await apiRequest(
-    "/download/start",
-    "POST",
-    {
-      url,
-      type
-    }
-  );
+    const url =
+        document.getElementById("mediaUrl").value;
 
-  const output = document.getElementById("downloadResult");
+    const typeSelect =
+        document.getElementById("downloadType");
 
-  if(result.success){
+    const qualitySelect =
+        document.getElementById("quality");
 
-    output.innerHTML = window.location.href =
-  `http://localhost:5000/api/download/file/${result.download._id}`;
+    const type =
+        typeSelect
+            ? typeSelect.value
+            : "mp4";
 
-  }else{
+    const quality =
+        qualitySelect
+            ? qualitySelect.value
+            : "720";
 
-    output.innerHTML = `
-      <p>Download failed</p>
-    `;
+    // Create a hidden form so the browser
+    // handles the file download directly.
+    const form =
+        document.createElement("form");
 
-  }
+    form.method = "POST";
+
+    form.action =
+        "http://localhost:5000/api/download/start";
+
+    form.style.display = "none";
+
+
+    const urlInput =
+        document.createElement("input");
+
+    urlInput.type = "hidden";
+
+    urlInput.name = "url";
+
+    urlInput.value = url;
+
+    form.appendChild(urlInput);
+
+
+    const typeInput =
+        document.createElement("input");
+
+    typeInput.type = "hidden";
+
+    typeInput.name = "type";
+
+    typeInput.value = type;
+
+    form.appendChild(typeInput);
+
+
+    const qualityInput =
+        document.createElement("input");
+
+    qualityInput.type = "hidden";
+
+    qualityInput.name = "quality";
+
+    qualityInput.value = quality;
+
+    form.appendChild(qualityInput);
+
+
+    document.body.appendChild(form);
+
+    form.submit();
+
+    form.remove();
 
 }

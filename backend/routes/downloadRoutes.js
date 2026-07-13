@@ -3,50 +3,50 @@ const express = require("express");
 const router = express.Router();
 
 const {
-
-  fetchMedia,
-
-  startDownload,
-
-  deleteDownload,
-
-  getSingleDownload,
-  downloadFile
-
-} = require(
-  "../controllers/downloadController"
-);
+    fetchMedia,
+    startDownload,
+    getSingleDownload,
+    deleteDownload
+} = require("../controllers/downloadController");
 
 const {
-  protect
-} = require(
-  "../middleware/authMiddleware"
-);
+    protect
+} = require("../middleware/authMiddleware");
 
+
+// =======================================
+// Public Routes
+// =======================================
+
+// Fetch media information
 router.post(
-  "/fetch",
-  protect,
-  fetchMedia
+    "/fetch",
+    fetchMedia
 );
 
+// Download video/audio
 router.post(
-  "/start",
-  protect,
-  startDownload
+    "/start",
+    startDownload
 );
 
-router.get("/file/:id", downloadFile);
 
+// =======================================
+// Protected Routes
+// =======================================
+
+// Get single download history
 router.get(
-  "/:id",
-  protect,
-  getSingleDownload
+    "/:id",
+    protect,
+    getSingleDownload
 );
 
+// Delete download history
 router.delete(
-  "/:id",
-  protect,
-  deleteDownload
+    "/:id",
+    protect,
+    deleteDownload
 );
 
 module.exports = router;
