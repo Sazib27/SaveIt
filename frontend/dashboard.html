@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8"/>
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0"/>
+
+  <title>Dashboard - SaveIt</title>
+
+  <link rel="stylesheet" href="css/style.css"/>
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+  <div class="logo">SaveIt</div>
+
+  <nav>
+    <a href="history.html">History</a>
+    <a href="premium.html">Premium</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </nav>
+
+</header>
+
+<section class="dashboard">
+
+  <div class="glass-card">
+
+    <h2>Download Media</h2>
+
+    <input
+      type="text"
+      id="mediaUrl"
+      placeholder="Paste media URL"
+    />
+
+    <select id="downloadType">
+
+      <option value="mp4">MP4 Video</option>
+
+      <option value="mp3">MP3 Audio</option>
+
+    </select>
+
+    <button onclick="startDownload()">
+      Download
+    </button>
+
+    <div id="downloadResult"></div>
+
+  </div>
+
+</section>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

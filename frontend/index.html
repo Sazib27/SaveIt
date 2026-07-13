@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaveIt - Media Downloader</title>
+
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="logo">SaveIt</div>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="premium.html">Premium</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+
+    <div class="glass-card">
+
+      <h1>Download Videos Instantly</h1>
+
+      <p>
+        Download videos from YouTube, TikTok, Instagram,
+        Facebook, X and Pinterest.
+      </p>
+
+      <div class="download-box">
+        <input
+          type="text"
+          id="mediaUrl"
+          placeholder="Paste video URL here..."
+        />
+
+        <button onclick="fetchMedia()">
+          Fetch Media
+        </button>
+      </div>
+
+      <div id="mediaPreview"></div>
+      <div id="downloadResult"></div>
+
+    </div>
+
+  </section>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

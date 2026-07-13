@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8"/>
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0"/>
+
+  <title>SaveIt Admin Dashboard</title>
+
+  <link rel="stylesheet"
+        href="css/admin.css"/>
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+  <aside class="sidebar">
+
+    <div class="logo">
+      SaveIt Admin
+    </div>
+
+    <nav>
+
+      <a href="#dashboard">
+        Dashboard
+      </a>
+
+      <a href="#users">
+        Users
+      </a>
+
+      <a href="#downloads">
+        Downloads
+      </a>
+
+      <a href="#payments">
+        Payments
+      </a>
+
+      <a href="#premium">
+        Premium Users
+      </a>
+
+      <a href="#settings">
+        Settings
+      </a>
+
+      <a href="#logout"
+         onclick="logoutAdmin()">
+        Logout
+      </a>
+
+    </nav>
+
+  </aside>
+
+  <main class="main-content">
+
+    <header class="topbar">
+
+      <h1>
+        Dashboard Overview
+      </h1>
+
+      <div class="admin-user">
+        Administrator
+      </div>
+
+    </header>
+
+    <section class="stats-grid">
+
+      <div class="stat-card">
+
+        <h2 id="totalUsers">
+          0
+        </h2>
+
+        <p>
+          Total Users
+        </p>
+
+      </div>
+
+      <div class="stat-card">
+
+        <h2 id="totalDownloads">
+          0
+        </h2>
+
+        <p>
+          Downloads
+        </p>
+
+      </div>
+
+      <div class="stat-card">
+
+        <h2 id="premiumUsers">
+          0
+        </h2>
+
+        <p>
+          Premium Users
+        </p>
+
+      </div>
+
+      <div class="stat-card">
+
+        <h2 id="totalRevenue">
+          ৳0
+        </h2>
+
+        <p>
+          Revenue
+        </p>
+
+      </div>
+
+    </section>
+
+    <section class="table-section">
+
+      <div class="table-card">
+
+        <div class="table-header">
+
+          <h2>
+            Users
+          </h2>
+
+        </div>
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Name</th>
+
+              <th>Email</th>
+
+              <th>Premium</th>
+
+              <th>Role</th>
+
+              <th>Actions</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="usersTable">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <section class="table-section">
+
+      <div class="table-card">
+
+        <div class="table-header">
+
+          <h2>
+            Recent Downloads
+          </h2>
+
+        </div>
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Title</th>
+
+              <th>Platform</th>
+
+              <th>User</th>
+
+              <th>Format</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="downloadsTable">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script src="js/admin.js"></script>
+
+</body>
+</html>
