@@ -1,40 +1,93 @@
-async function loadHistory(){
+async function loadHistory() {
 
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  const response = await fetch(
-    "http://localhost:5000/api/user/history",
-    {
-      headers:{
-        Authorization:`Bearer ${token}`
-      }
+    if (!token) {
+
+        window.location.href = "login.html";
+        return;
+
     }
-  );
 
-  const data = await response.json();
+    try {
 
-  const container =
-    document.getElementById("historyContainer");
+        const response = await fetch(
+            "http://localhost:5000/api/user/history",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
 
-  container.innerHTML = "";
+        const data = await response.json();
 
-  data.forEach(item => {
+        const container =
+            document.getElementById("historyContainer");
 
-    container.innerHTML += `
-      <div class="history-card">
+        container.innerHTML = "";
 
-        <h3>${item.title}</h3>
+        if (!data.success) {
 
-        <p>${item.platform}</p>
+            container.innerHTML =
+                "<h3>Failed to load history.</h3>";
 
-        <a href="http://localhost:5000${item.fileUrl}" target="_blank">
-          Download Again
-        </a>
+            return;
 
-      </div>
-    `;
+        }
 
-  });
+        if (data.downloads.length === 0) {
+
+            container.innerHTML =
+                "<h3>No download history yet.</h3>";
+
+            return;
+
+        }
+
+        data.downloads.forEach(item => {
+
+            container.innerHTML += `
+
+            <div class="history-card">
+
+                <h3>${item.title}</h3>
+
+                <p>
+                    Platform :
+                    ${item.sourcePlatform}
+                </p>
+
+                <p>
+                    Type :
+                    ${item.mediaType}
+                </p>
+
+                <p>
+                    Quality :
+                    ${item.quality}
+                </p>
+
+                <a
+                    href="http://localhost:5000${item.fileUrl}"
+                    target="_blank"
+                >
+                    Download Again
+                </a>
+
+            </div>
+
+            `;
+
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+    }
 
 }
 

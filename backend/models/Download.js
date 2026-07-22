@@ -1,255 +1,109 @@
-const ytDlp = require("yt-dlp-exec");
-const path = require("path");
-const fs = require("fs");
+const mongoose = require("mongoose");
 
-// ========================================
-// Downloads Folder
-// ========================================
+const downloadSchema = new mongoose.Schema(
+{
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
+    },
 
-const DOWNLOAD_DIR = path.join(__dirname, "..", "downloads");
+    originalUrl: {
+        type: String,
+        required: true
+    },
 
-if (!fs.existsSync(DOWNLOAD_DIR)) {
-    fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });
-}
+    sourcePlatform: {
+        type: String,
+        enum: [
+            "youtube",
+            "instagram",
+            "facebook",
+            "tiktok",
+            "twitter",
+            "pinterest",
+            "unknown"
+        ],
+        default: "unknown"
+    },
 
+    mediaType: {
+        type: String,
+        enum: ["video", "audio"],
+        default: "video"
+    },
 
-// ========================================
-// Detect Platform
-// ========================================
+    title: {
+        type: String,
+        required: true
+    },
 
-function detectPlatform(url) {
+    description: {
+        type: String,
+        default: ""
+    },
 
-    if (url.includes("youtu")) return "youtube";
+    thumbnail: {
+        type: String,
+        default: ""
+    },
 
-    if (url.includes("instagram")) return "instagram";
+    duration: {
+        type: Number,
+        default: 0
+    },
 
-    if (url.includes("facebook")) return "facebook";
+    quality: {
+        type: String,
+        default: "720p"
+    },
 
-    if (url.includes("tiktok")) return "tiktok";
+    format: {
+        type: String,
+        default: "mp4"
+    },
 
-    if (url.includes("twitter") || url.includes("x.com"))
-        return "twitter";
+    fileName: {
+        type: String,
+        required: true
+    },
 
-    if (url.includes("pinterest"))
-        return "pinterest";
+    filePath: {
+        type: String,
+        required: true
+    },
 
-    return "unknown";
-}
+    fileUrl: {
+        type: String,
+        required: true
+    },
 
+    fileSize: {
+        type: Number,
+        default: 0
+    },
 
-// ========================================
-// Safe File Name
-// ========================================
+    downloadStatus: {
+        type: String,
+        enum: [
+            "pending",
+            "processing",
+            "completed",
+            "failed"
+        ],
+        default: "completed"
+    },
 
-function safeName(title) {
-
-    return title
-        .replace(/[<>:"/\\|?*]+/g, "")
-        .replace(/\s+/g, "_")
-        .substring(0, 120);
-
-}
-
-
-// ========================================
-// Fetch Metadata
-// ========================================
-
-async function fetchMetadata(url) {
-
-    try {
-
-        const info = await ytDlp(url, {
-            dumpSingleJson: true,
-            noWarnings: true
-        });
-
-        return {
-
-            success: true,
-
-            title: info.title,
-
-            description: info.description,
-
-            thumbnail: info.thumbnail,
-
-            duration: info.duration,
-
-            uploader: info.uploader,
-
-            viewCount: info.view_count,
-
-            platform: detectPlatform(url)
-
-        };
-
-    } catch (err) {
-
-        return {
-
-            success: false,
-
-            message: err.message
-
-        };
-
+    downloadCount: {
+        type: Number,
+        default: 0
     }
-
-}
-
-
-// ========================================
-// Download Video
-// ========================================
-
-async function downloadVideo(url, quality = "720") {
-
-    try {
-
-        const info = await ytDlp(url, {
-            dumpSingleJson: true
-        });
-
-        const fileName =
-            `${Date.now()}_${safeName(info.title)}.mp4`;
-
-        const output =
-            path.join(DOWNLOAD_DIR, fileName);
-
-        let format = "best";
-
-        if (quality === "1080")
-            format = "bestvideo[height<=1080]+bestaudio/best";
-
-        else if (quality === "720")
-            format = "bestvideo[height<=720]+bestaudio/best";
-
-        else if (quality === "480")
-            format = "bestvideo[height<=480]+bestaudio/best";
-
-        await ytDlp(url, {
-
-            output,
-
-            format,
-
-            mergeOutputFormat: "mp4",
-
-            noWarnings: true,
-
-            noCheckCertificates: true
-
-        });
-
-        return {
-
-            success: true,
-
-            fileName,
-
-            filePath: output,
-
-            title: info.title,
-
-            thumbnail: info.thumbnail,
-
-            duration: info.duration,
-
-            platform: detectPlatform(url)
-
-        };
-
-    } catch (err) {
-
-        return {
-
-            success: false,
-
-            message: err.message
-
-        };
-
-    }
-
-}
-
-
-// ========================================
-// Download Audio
-// ========================================
-
-async function downloadAudio(url) {
-
-    try {
-
-        const info = await ytDlp(url, {
-            dumpSingleJson: true
-        });
-
-        const fileName =
-            `${Date.now()}_${safeName(info.title)}.mp3`;
-
-        const output =
-            path.join(DOWNLOAD_DIR, fileName);
-
-        await ytDlp(url, {
-
-            output,
-
-            extractAudio: true,
-
-            audioFormat: "mp3",
-
-            audioQuality: "192K",
-
-            noWarnings: true,
-
-            noCheckCertificates: true
-
-        });
-
-        return {
-
-            success: true,
-
-            fileName,
-
-            filePath: output,
-
-            title: info.title,
-
-            thumbnail: info.thumbnail,
-
-            duration: info.duration,
-
-            platform: detectPlatform(url)
-
-        };
-
-    } catch (err) {
-
-        return {
-
-            success: false,
-
-            message: err.message
-
-        };
-
-    }
-
-}
-
-
-module.exports = {
-
-    fetchMetadata,
-
-    downloadVideo,
-
-    downloadAudio,
-
-    detectPlatform
-
-};
+},
+{
+    timestamps: true
+});
+
+module.exports = mongoose.model(
+    "Download",
+    downloadSchema
+);

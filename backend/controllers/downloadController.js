@@ -131,45 +131,69 @@ exports.startDownload = async (req, res) => {
         const stats = fs.statSync(result.filePath);
 
         // Save history only if logged in
-        let history = null;
+        const jwt = require("jsonwebtoken");
 
-        if (req.user) {
+let userId = null;
 
-            history = await Download.create({
+const authHeader = req.headers.authorization;
 
-                user: req.user._id,
+if (
+    authHeader &&
+    authHeader.startsWith("Bearer ")
+) {
 
-                originalUrl: url,
+    try {
 
-                sourcePlatform: result.platform,
+        const token = authHeader.split(" ")[1];
 
-                mediaType: type === "mp3"
-                    ? "audio"
-                    : "video",
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
 
-                title: result.title,
+        userId = decoded.id;
 
-                thumbnail: result.thumbnail,
+    } catch (err) {
 
-                duration: result.duration,
+        console.log("Guest download.");
 
-                quality: quality + "p",
+    }
 
-                format: type,
+}
 
-                fileName: result.fileName,
+await Download.create({
 
-                filePath: result.filePath,
+    user: userId,
 
-                fileUrl: "/downloads/" + result.fileName,
+    originalUrl: url,
 
-                fileSize: stats.size,
+    sourcePlatform: result.platform,
 
-                downloadStatus: "completed"
+    mediaType: type === "mp3"
+        ? "audio"
+        : "video",
 
-            });
+    title: result.title,
 
-        }
+    thumbnail: result.thumbnail,
+
+    duration: result.duration,
+
+    quality: quality + "p",
+
+    format: type,
+
+    fileName: result.fileName,
+
+    filePath: result.filePath,
+
+    fileUrl: "/downloads/" + result.fileName,
+
+    fileSize: stats.size,
+
+    downloadStatus: "completed"
+
+});
 
         console.log("Sending file to browser...");
 

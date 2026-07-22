@@ -141,3 +141,27 @@ function startDownload() {
     form.remove();
 
 }
+
+async function pasteClipboard() {
+
+    try {
+
+        const text = await navigator.clipboard.readText();
+
+        document.getElementById("mediaUrl").value = text;
+
+    } catch (err) {
+
+        alert("Clipboard permission denied.");
+
+    }
+
+}
+
+function clearInput(){
+
+    document.getElementById("mediaUrl").value="";
+
+    document.getElementById("mediaPreview").innerHTML="";
+
+}

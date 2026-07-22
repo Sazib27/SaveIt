@@ -91,39 +91,37 @@ exports.updateProfile =
 
 };
 
-exports.getHistory =
-  async (req, res) => {
+exports.getHistory = async (req, res) => {
 
-  try {
+    try {
 
-    const downloads =
-      await Download.find({
-        user: req.user._id
-      })
+        console.log("========== HISTORY ==========");
+        console.log("req.user:", req.user);
 
-      .sort({
-        createdAt: -1
-      });
+        const downloads = await Download.find({
+            user: req.user._id
+        }).sort({
+            createdAt: -1
+        });
 
-    res.json({
+        console.log("Downloads found:", downloads.length);
 
-      success: true,
+        return res.json({
+            success: true,
+            downloads
+        });
 
-      downloads
+    } catch (err) {
 
-    });
+        console.error("========== HISTORY ERROR ==========");
+        console.error(err.stack);
 
-  } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
 
-    res.status(500).json({
-
-      success: false,
-
-      message: error.message
-
-    });
-
-  }
+    }
 
 };
 

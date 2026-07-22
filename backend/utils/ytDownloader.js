@@ -1,280 +1,274 @@
 const ytDlp = require("yt-dlp-exec");
-
 const path = require("path");
-
 const fs = require("fs");
 
-const downloadsDir =
-  path.join(__dirname, "../downloads");
+const DOWNLOAD_DIR = path.join(__dirname, "..", "downloads");
 
-if (!fs.existsSync(downloadsDir)) {
-  fs.mkdirSync(downloadsDir, {
-    recursive: true
-  });
+if (!fs.existsSync(DOWNLOAD_DIR)) {
+    fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });
 }
 
-const detectPlatform = (url) => {
+// =====================================
+// Detect Platform
+// =====================================
 
-  if (url.includes("youtube.com") ||
-      url.includes("youtu.be")) {
-    return "youtube";
-  }
+function detectPlatform(url) {
 
-  if (url.includes("instagram.com")) {
-    return "instagram";
-  }
+    url = url.toLowerCase();
 
-  if (url.includes("tiktok.com")) {
-    return "tiktok";
-  }
+    if (url.includes("youtu")) return "youtube";
 
-  if (url.includes("facebook.com")) {
-    return "facebook";
-  }
+    if (url.includes("instagram")) return "instagram";
 
-  if (url.includes("twitter.com") ||
-      url.includes("x.com")) {
-    return "twitter";
-  }
+    if (url.includes("facebook")) return "facebook";
 
-  if (url.includes("pinterest.com")) {
-    return "pinterest";
-  }
+    if (url.includes("tiktok")) return "tiktok";
 
-  return "unknown";
-};
+    if (url.includes("twitter") || url.includes("x.com"))
+        return "twitter";
 
-const sanitizeFileName = (name) => {
+    if (url.includes("pinterest"))
+        return "pinterest";
 
-  return name
-    .replace(/[^\w\s]/gi, "")
-    .replace(/\s+/g, "_")
-    .substring(0, 100);
+    return "unknown";
+}
 
-};
+// =====================================
+// Safe File Name
+// =====================================
 
-const fetchMetadata = async (url) => {
+function safeName(title = "video") {
 
-  try {
+    return title
+        .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+        .replace(/\s+/g, "_")
+        .substring(0, 100);
+}
 
-    const info = await ytDlp(url, {
+// =====================================
+// Fetch Metadata
+// =====================================
 
-      dumpSingleJson: true,
+async function fetchMetadata(url) {
 
-      noWarnings: true,
+    try {
 
-      noCheckCertificates: true,
+        const info = await ytDlp(url, {
 
-      preferFreeFormats: true,
+            dumpSingleJson: true,
 
-      youtubeSkipDashManifest: true
+            noWarnings: true,
 
-    });
+            noCheckCertificates: true
 
-    return {
+        });
 
-      success: true,
+        return {
 
-      platform: detectPlatform(url),
+            success: true,
 
-      title: info.title,
+            title: info.title,
 
-      description: info.description,
+            description: info.description,
 
-      duration: info.duration,
+            thumbnail: info.thumbnail,
 
-      thumbnail: info.thumbnail,
+            duration: info.duration,
 
-      uploader: info.uploader,
+            uploader: info.uploader,
 
-      viewCount: info.view_count,
+            viewCount: info.view_count,
 
-      likeCount: info.like_count,
+            platform: detectPlatform(url)
 
-      formats: info.formats
+        };
 
-    };
+    } catch (err) {
 
-  } catch (error) {
+        console.log(err);
 
-    return {
+        return {
 
-      success: false,
+            success: false,
 
-      message: error.message
+            message: err.message
 
-    };
-
-  }
-
-};
-
-const downloadVideo = async (
-  url,
-  quality = "720",
-  format = "mp4"
-) => {
-
-  try {
-
-    const info = await ytDlp(url, {
-      dumpSingleJson: true
-    });
-
-    const safeTitle =
-      sanitizeFileName(info.title);
-
-    const fileName =
-      `${Date.now()}_${safeTitle}.${format}`;
-
-    const outputPath =
-      path.join(downloadsDir, fileName);
-
-    let ytFormat = "";
-
-    if (quality === "1080") {
-
-      ytFormat =
-        "bestvideo[height<=1080]+bestaudio/best";
-
-    } else if (quality === "720") {
-
-      ytFormat =
-        "bestvideo[height<=720]+bestaudio/best";
-
-    } else if (quality === "480") {
-
-      ytFormat =
-        "bestvideo[height<=480]+bestaudio/best";
-
-    } else {
-
-      ytFormat = "best";
-
+        };
     }
 
-    await ytDlp(url, {
-    output: outputPath,
-    format: ytFormat,
-    mergeOutputFormat: format,
-    noWarnings: true,
-    noCheckCertificates: true
-});
+}
 
-    return {
+// =====================================
+// Download Video
+// =====================================
 
-      success: true,
+async function downloadVideo(
+    url,
+    quality = "720"
+) {
 
-      fileName,
+    try {
 
-      filePath: outputPath,
+        const info = await ytDlp(url, {
 
-      fileUrl: `/downloads/${fileName}`,
+            dumpSingleJson: true
 
-      title: info.title,
+        });
 
-      thumbnail: info.thumbnail,
+        const fileName =
+            `${Date.now()}_${safeName(info.title)}.mp4`;
 
-      duration: info.duration,
+        const output =
+            path.join(DOWNLOAD_DIR, fileName);
 
-      platform: detectPlatform(url)
+        let format = "best";
 
-    };
+        if (detectPlatform(url) === "youtube") {
 
-  } catch (error) {
+            if (quality === "1080")
 
-    return {
+                format =
+                    "bestvideo[height<=1080]+bestaudio/best";
 
-      success: false,
+            else if (quality === "720")
 
-      message: error.message
+                format =
+                    "bestvideo[height<=720]+bestaudio/best";
 
-    };
+            else if (quality === "480")
 
-  }
+                format =
+                    "bestvideo[height<=480]+bestaudio/best";
+        }
 
-};
+        await ytDlp(url, {
 
-const downloadAudio = async (
-  url,
-  bitrate = "192"
-) => {
+            output,
 
-  try {
+            format,
 
-    const info = await ytDlp(url, {
-      dumpSingleJson: true
-    });
+            mergeOutputFormat: "mp4",
 
-    const safeTitle =
-      sanitizeFileName(info.title);
+            noWarnings: true,
 
-    const fileName =
-      `${Date.now()}_${safeTitle}.mp3`;
+            noCheckCertificates: true
 
-    const outputPath =
-      path.join(downloadsDir, fileName);
+        });
 
-    await ytDlp(url, {
+        return {
 
-      output: outputPath,
+            success: true,
 
-      extractAudio: true,
+            fileName,
 
-      audioFormat: "mp3",
+            filePath: output,
 
-      audioQuality: bitrate,
+            fileUrl: "/downloads/" + fileName,
 
-      ffmpegLocation: "/usr/bin/ffmpeg",
+            title: info.title,
 
-      noWarnings: true,
+            thumbnail: info.thumbnail,
 
-      noCheckCertificates: true
+            duration: info.duration,
 
-    });
+            platform: detectPlatform(url)
 
-    return {
+        };
 
-      success: true,
+    } catch (err) {
 
-      fileName,
+        console.log(err);
 
-      filePath: outputPath,
+        return {
 
-      fileUrl: `/downloads/${fileName}`,
+            success: false,
 
-      title: info.title,
+            message: err.message
 
-      thumbnail: info.thumbnail,
+        };
+    }
 
-      duration: info.duration,
+}
 
-      platform: detectPlatform(url)
+// =====================================
+// Download Audio
+// =====================================
 
-    };
+async function downloadAudio(url) {
 
-  } catch (error) {
+    try {
 
-    return {
+        const info = await ytDlp(url, {
 
-      success: false,
+            dumpSingleJson: true
 
-      message: error.message
+        });
 
-    };
+        const fileName =
+            `${Date.now()}_${safeName(info.title)}.mp3`;
 
-  }
+        const output =
+            path.join(DOWNLOAD_DIR, fileName);
 
-};
+        await ytDlp(url, {
+
+            output,
+
+            extractAudio: true,
+
+            audioFormat: "mp3",
+
+            audioQuality: "192K",
+
+            noWarnings: true,
+
+            noCheckCertificates: true
+
+        });
+
+        return {
+
+            success: true,
+
+            fileName,
+
+            filePath: output,
+
+            fileUrl: "/downloads/" + fileName,
+
+            title: info.title,
+
+            thumbnail: info.thumbnail,
+
+            duration: info.duration,
+
+            platform: detectPlatform(url)
+
+        };
+
+    } catch (err) {
+
+        console.log(err);
+
+        return {
+
+            success: false,
+
+            message: err.message
+
+        };
+    }
+
+}
 
 module.exports = {
 
-  fetchMetadata,
+    fetchMetadata,
 
-  downloadVideo,
+    downloadVideo,
 
-  downloadAudio,
+    downloadAudio,
 
-  detectPlatform
+    detectPlatform
 
 };

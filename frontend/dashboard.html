@@ -29,32 +29,40 @@
 
 <section class="dashboard">
 
-  <div class="glass-card">
+  <div class="download-container">
 
-    <h2>Download Media</h2>
+    <h1>Download Videos Instantly</h1>
 
-    <input
-      type="text"
-      id="mediaUrl"
-      placeholder="Paste media URL"
-    />
+    <p>
+        Download videos from YouTube, Instagram,
+        TikTok, Facebook, X and Pinterest.
+    </p>
 
-    <select id="downloadType">
+    <div class="search-box">
 
-      <option value="mp4">MP4 Video</option>
+        <input
+            id="mediaUrl"
+            type="text"
+            placeholder="Paste Video URL..."
+        >
 
-      <option value="mp3">MP3 Audio</option>
+        <button class="paste-btn" onclick="pasteClipboard()">
+    📋 Paste
+</button>
 
-    </select>
+<button class="clear-btn" onclick="clearInput()">
+    ✖
+</button>
 
-    <button onclick="startDownload()">
-      Download
-    </button>
+<button class="download-btn" onclick="fetchMedia()">
+    ⬇ Download
+</button>
 
-    <div id="downloadResult"></div>
+    </div>
 
-  </div>
+    <div id="mediaPreview"></div>
 
+</div>
 </section>
 
 <script src="js/api.js"></script>
